@@ -2,4 +2,7 @@
 fr:
   label_wtp_setting: Ligne de commande
   description_wtp_setting: "Options d'exécution pour wkhtmltopdf"
+  label_wtp_keeptmp: Keep temporary file
+  description_wtp_keeptmp: Check to keep command file and PDF in tmp/pdf directory
   greeting: "Configuration du lancement de WKHTMLTOPDF utilisé dans REDMINE."
+

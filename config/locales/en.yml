@@ -2,4 +2,6 @@
 en:
   label_wtp_setting: Command line
   description_wtp_setting: Options to use for wkhtmltopdf
+  label_wtp_keeptmp: Keep temporary files
+  description_wtp_keeptmp: Check to keep command file and PDF in tmp/pdf directory
   greeting: This will allow you to use configure WKHTMLTOPDF for REDMINE.

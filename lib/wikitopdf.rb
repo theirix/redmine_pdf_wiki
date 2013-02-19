@@ -78,12 +78,17 @@ module Wikitopdf
         f.write(args.join(' '))
       end
 
-      `#{Setting.plugin_redmine_pdf_wiki['wtp_command']} --read-args-from-stdin < #{cmdname}`
+      command = "#{Setting.plugin_redmine_pdf_wiki['wtp_command']} --read-args-from-stdin < #{cmdname}"
+      `#{command}`
+      # Actually we need to return 500 page but it is a helper method so we generate only PDF bytes
+      raise "Command '#{command}' failed with code #{$?}" if $? != 0
       
       IO.read(pdfname)
     ensure
-      safe_unlink cmdname 
-      safe_unlink pdfname
+      unless (Setting.plugin_redmine_pdf_wiki['wtp_keeptmp'] || 0)
+        safe_unlink cmdname
+        safe_unlink pdfname
+      end
     end
   
     # unlink that never throws
@@ -92,7 +97,7 @@ module Wikitopdf
       begin
         File.unlink filename
       rescue => e
-        Rails.logger.warn("Cannot unlink temp file " + filename) if Rails.logger && Rails.logger.debug?
+        Rails.logger.warn("Cannot unlink temp file " + filename) if Rails.logger && Rails.logger.warn?
       end
     end
     
