@@ -6,7 +6,7 @@ Redmine::Plugin.register :redmine_pdf_wiki do
   name 'WikiToPdf plugin'
   author 'Arnaud Martel'
   description 'Export wiki pages to PDF file'
-  version '0.0.4'
+  version '0.0.5'
   
   # due to Dispatcher changes
   requires_redmine :version_or_higher => '2.0.0'

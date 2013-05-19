@@ -14,40 +14,77 @@ module Wikitopdf
     end
   
     def export
-      @pages = @wiki.pages.find :all, :select => "#{WikiPage.table_name}.*, #{WikiContent.table_name}.updated_on",
-      :joins => "LEFT JOIN #{WikiContent.table_name} ON #{WikiContent.table_name}.page_id = #{WikiPage.table_name}.id",
-      :order => 'title'
-      @pages_by_parent_id = @pages.group_by(&:parent_id)
       to_pdf
     end
     
-    private
+  private
     
-    def url_for hash
-      @controller.url_for hash
+    def url_by_page page
+      '"' + @controller.url_for(:controller => 'wiki', :action => 'show', 
+        :project_id => page.project, :id => page.title) + '"'
     end
-
-    def pdf_page_hierarchy(pages, node=nil)
+    
+    def pdf_page_hierarchy(node)
+      pages = @wiki.pages.find :all, 
+        :select => "#{WikiPage.table_name}.*, #{WikiContent.table_name}.updated_on",
+        :joins => "LEFT JOIN #{WikiContent.table_name} ON "+
+          "#{WikiContent.table_name}.page_id = #{WikiPage.table_name}.id",
+        :order => 'title'
+      pages_by_parent_id = pages.group_by(&:parent_id)
+      pdf_page_hierarchy_impl(pages_by_parent_id, node)
+    end
+      
+    def pdf_page_hierarchy_impl(pages, node)
       content=[]
       if pages[node]
         pages[node].each do |page|
           title = page.title.downcase
           if title != "sidebar" && title != "stylesheet"
-            content << '"' + url_for(:controller => 'wiki', :action => 'show', :project_id => page.project, :id => page.title) + '"'
-            content += pdf_page_hierarchy(pages, page.id) if pages[page.id]
+            content << url_by_page(page)
+            content += pdf_page_hierarchy_impl(pages, page.id) if pages[page.id]
           end
         end
       end
       content
+    end
+    
+    def wiki_page_by_pretty_title pretty_title
+      wp = WikiPage.all.find { |wp| wp.pretty_title == pretty_title }
+      raise "No such page #{pretty_title}" unless wp
+      wp
+    end
+    
+    # Extract page links from TOC wikipage
+    def pages_from_toc page
+      page.content.text.split("\r\n").
+        reject { |s| s.empty? || s.index("[[") == nil }.
+        map { |s| s.gsub(/.*\[\[(.*)\]\].*/, '\1') }.
+        map { |s| wiki_page_by_pretty_title s }.
+        map { |wp| url_by_page(wp) }
+    end
+    
+    # Return ordered list of wiki page URLs
+    # which is passed to converter
+    def extract_pages_list
+      if @page
+        if @page.wikitopdf_toc_page && @page.wikitopdf_toc_page.istoc
+          pages_from_toc @page
+        else
+          [ url_by_page(@page) ] + pdf_page_hierarchy(@page.id)
+        end
+      else
+        pdf_page_hierarchy(nil)
+      end
     end
 
     def to_pdf
       t = Time.now.strftime("%d")
       
       pdfname = "#{@tmpdir}/#{t}#{rand(0x100000000).to_s(36)}.pdf"
-      node = @page.nil? ? nil : @page.id
       #args = Setting.plugin_redmine_pdf_wiki['wtp_command'].split(' ')
       #args << '--quiet'
+
+      pages_list = extract_pages_list
 
       args = [ '--quiet' ]
 
@@ -67,11 +104,10 @@ module Wikitopdf
         args << '"' + value +'"'
       end
       args << '--custom-header-propagation' if flg
-      if !@page.nil?
-        args << '"' + url_for(:controller => 'wiki', :action => 'show', :project_id => @page.project, :id => @page.title)  + '"'
-      end
-      args += pdf_page_hierarchy(@pages_by_parent_id, node)
+      args += pages_list
       args << pdfname
+
+      Rails.logger.debug "Exporting #{pages_list.size} wikipages: " + pages_list.join(' ')
 
       cmdname = "#{@tmpdir}/#{t}#{rand(0x100000000).to_s(36)}.txt"
       File.open(cmdname, "w") do |f|
@@ -80,6 +116,7 @@ module Wikitopdf
 
       command = "#{Setting.plugin_redmine_pdf_wiki['wtp_command']} --read-args-from-stdin < #{cmdname}"
       `#{command}`
+      
       # Actually we need to return 500 page but it is a helper method so we generate only PDF bytes
       raise "Command '#{command}' failed with code #{$?}" if $? != 0
       
