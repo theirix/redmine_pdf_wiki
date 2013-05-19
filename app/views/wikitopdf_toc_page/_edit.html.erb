@@ -1,0 +1,8 @@
+<div class="wikitopdf-tocpage">	
+	<%= fields_for(:wikitopdf_toc_page, page.wikitopdf_toc_page) do |builder| %>
+	<p>
+		<label><%= l(:tocpage_label) %></label>
+		<%= builder.check_box :istoc %>
+	</p>
+	<% end %>
+</div>

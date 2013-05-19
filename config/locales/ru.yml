@@ -5,3 +5,4 @@ ru:
   label_wtp_keeptmp: Оставлять временные файлы
   description_wtp_keeptmp: Отметьте для сохранения файла команд и PDF в директории tmp/pdf
   greeting: Плагин позволяет сконфигурировать WKHTMLTOPDF для REDMINE.
+  tocpage_label: Страница оглавления
