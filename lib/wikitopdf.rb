@@ -48,8 +48,8 @@ module Wikitopdf
       content
     end
     
-    def wiki_page_by_pretty_title pretty_title
-      wp = WikiPage.all.find { |wp| wp.pretty_title == pretty_title }
+    def wiki_page_by_pretty_title wiki, pretty_title
+      wp = wiki.pages.find { |wp| wp.pretty_title == pretty_title }
       raise "No such page #{pretty_title}" unless wp
       wp
     end
@@ -59,7 +59,7 @@ module Wikitopdf
       page.content.text.split("\r\n").
         reject { |s| s.empty? || s.index("[[") == nil }.
         map { |s| s.gsub(/.*\[\[(.*)\]\].*/, '\1') }.
-        map { |s| wiki_page_by_pretty_title s }.
+        map { |s| wiki_page_by_pretty_title(page.wiki,s) }.
         map { |wp| url_by_page(wp) }
     end
     
@@ -107,7 +107,7 @@ module Wikitopdf
       args += pages_list
       args << pdfname
 
-      Rails.logger.debug "Exporting #{pages_list.size} wikipages: " + pages_list.join(' ')
+      Rails.logger.debug("Exporting #{pages_list.size} wikipages: " + pages_list.join(' ')) if Rails.logger && Rails.logger.debug?
 
       cmdname = "#{@tmpdir}/#{t}#{rand(0x100000000).to_s(36)}.txt"
       File.open(cmdname, "w") do |f|
