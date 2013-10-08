@@ -49,7 +49,7 @@ module Wikitopdf
     end
     
     def wiki_page_by_pretty_title wiki, pretty_title
-      wp = wiki.pages.find { |wp| wp.pretty_title == pretty_title }
+      wp = wiki.pages.find { |wp| wp.pretty_title.casecmp(pretty_title)==0 }
       raise "No such page #{pretty_title}" unless wp
       wp
     end
