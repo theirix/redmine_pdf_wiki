@@ -115,6 +115,7 @@ module Wikitopdf
       end
 
       command = "#{Setting.plugin_redmine_pdf_wiki['wtp_command']} --read-args-from-stdin < #{cmdname}"
+      Rails.logger.info("Executing " + command) if Rails.logger && Rails.logger.info?
       `#{command}`
       
       # Actually we need to return 500 page but it is a helper method so we generate only PDF bytes
