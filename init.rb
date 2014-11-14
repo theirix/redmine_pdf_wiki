@@ -7,7 +7,7 @@ Redmine::Plugin.register :redmine_pdf_wiki do
   author 'Arnaud Martel'
   description 'Export wiki pages to PDF file'
   version '0.0.5'
-  
+
   # due to Dispatcher changes
   requires_redmine :version_or_higher => '2.0.0'
 
@@ -18,6 +18,7 @@ require 'wikitopdf'
 require 'wiki_page_patch'
 
 ActionDispatch::Callbacks.to_prepare do
+  require_dependency 'redmine/export/pdf'
   unless WikiController.included_modules.include? Wikitopdf::PDFPatch
     WikiController.send(:include, Wikitopdf::PDFPatch)
   end
