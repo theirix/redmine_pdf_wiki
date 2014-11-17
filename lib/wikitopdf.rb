@@ -52,7 +52,7 @@ module Wikitopdf
     def wiki_page_by_pretty_title wiki, pretty_title
       effective_title = pretty_title.split('|').first
       wp = wiki.pages.find { |wp| wp.pretty_title.casecmp(effective_title)==0 }
-      raise "No such page #{effective_title} (full title #{pretty_title}, real title #{wiki.title})" unless wp
+      raise "No such page #{effective_title} (full title #{pretty_title}" unless wp
       wp
     end
 
