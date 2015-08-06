@@ -1,3 +1,6 @@
+0.0.8: 2015-07-07
+- Support Redmine 3.x
+
 0.0.5: 2013-05-20
 - Allowed to export predefined list of wikipages by exporting a tagged wikipage with TOC
 
@@ -14,7 +17,7 @@ remove unused lib directory
 update default command line used to run wkhtmltopdf
 
 0.0.2 : 2011-06-09
-Don't use anymore the command line to specify wiki pages (there was a 4Ko limit) 
+Don't use anymore the command line to specify wiki pages (there was a 4Ko limit)
 
 0.0.1 : 2010-09-16
 Initial release
