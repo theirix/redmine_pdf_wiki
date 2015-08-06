@@ -2,7 +2,7 @@ h1. Introduction
 
 This plugin allows to export wiki page(s) to .pdf file using WKHTML2PDF
 
-Requires Redmine 2.x.
+Requires Redmine 2.x or 3.x.
 
 h1. Setup
 
@@ -13,18 +13,20 @@ From wkhtml2pdf website
 
 h3. 2. Install plugin
 
-Install redmine_pdf_wiki with:
-* cd <redmine directory>/plugins
-* tar xvzf redmine_pdf_wiki.tgz
+Install redmine_pdf_wiki to @<redmine directory>/plugins@
 
-No DB migration is required...
+Migrate a database with:
+<code>
+bundle exec rake redmine:plugins:migrate
+</code>
 
 h3. 3. Web server configuration
 
 If you are using Apache + Passenger, you have to change passenger settings to add:
 * PassengerUseGlobalQueue on
 
-If you are using another web server configuration, you may have to configure something to allow a web request to recursively call your web server (if you have a blank page that takes an infinite time to be loaded...)  
+If you are using another web server configuration, you may have to configure something to allow a web request to
+recursively call your web server (if you have a blank page that takes an infinite time to be loaded...)
 
 h3. 4. Restart your web server
 

@@ -22,15 +22,13 @@ module Wikitopdf
 
     def url_by_page page
       '"' + @controller.url_for(:controller => 'wiki', :action => 'show',
-        :project_id => page.project, :id => page.title) + '"'
+        :project_id => page.project, :id => page.title,
+        :host => Setting.host_name) + '"'
     end
 
     def pdf_page_hierarchy(node)
-      pages = @wiki.pages.find :all,
-        :select => "#{WikiPage.table_name}.*, #{WikiContent.table_name}.updated_on",
-        :joins => "LEFT JOIN #{WikiContent.table_name} ON "+
-          "#{WikiContent.table_name}.page_id = #{WikiPage.table_name}.id",
-        :order => 'title'
+      pages = @wiki.pages.joins(:content).order(:title).select('wiki_pages.*, wiki_contents.updated_on')
+      Rails.logger.debug("pages #{pages.size}")
       pages_by_parent_id = pages.group_by(&:parent_id)
       pdf_page_hierarchy_impl(pages_by_parent_id, node)
     end
@@ -70,7 +68,7 @@ module Wikitopdf
     def extract_pages_list
       if @page
         if @page.wikitopdf_toc_page && @page.wikitopdf_toc_page.istoc
-          pages_from_toc @page
+          [ url_by_page(@page) ] + pages_from_toc(@page)
         else
           [ url_by_page(@page) ] + pdf_page_hierarchy(@page.id)
         end

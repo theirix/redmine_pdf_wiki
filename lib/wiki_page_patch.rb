@@ -1,7 +1,7 @@
 module Wikitopdf
 
   class ViewHook < Redmine::Hook::ViewListener
-    
+
     def view_layouts_base_body_bottom(context= { })
       controller = context[:controller]
       action = controller.action_name
@@ -31,12 +31,12 @@ module Wikitopdf
         :locals => {:page => context[:page] }
       })
     end
-    
+
   end
-  
+
   # Hook controller to save TocPage in wikipage
   class ControllerHook < Redmine::Hook::Listener
-    
+
     def controller_wiki_edit_after_save context
       attrs = context[:params][:wikitopdf_toc_page]
       if context[:page].wikitopdf_toc_page
@@ -46,10 +46,10 @@ module Wikitopdf
       end
     end
   end
-  
+
   # Module for patching wiki model
   module WikiPagePatch
-  
+
     def self.included(base)
       base.class_eval do
         unloadable
@@ -57,6 +57,6 @@ module Wikitopdf
         accepts_nested_attributes_for :wikitopdf_toc_page
       end
     end
-  end  
-        
+  end
+
 end
