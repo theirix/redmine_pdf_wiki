@@ -11,6 +11,7 @@ module Wikitopdf
       @controller = controller
       @wiki = @project.wiki
       @tmpdir = Rails.root.join('tmp', 'pdf')
+      FileUtils.mkdir_p(@tmpdir) unless File.directory?(@tmpdir)
       raise 'No wiki page found' unless @wiki
     end
 
