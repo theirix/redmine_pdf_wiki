@@ -1,3 +1,6 @@
+0.0.9: 2015-08-18
+- Support relative uri deployment
+
 0.0.8: 2015-07-07
 - Support Redmine 3.x
 

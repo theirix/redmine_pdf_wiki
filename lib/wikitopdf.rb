@@ -11,6 +11,7 @@ module Wikitopdf
       @controller = controller
       @wiki = @project.wiki
       @tmpdir = Rails.root.join('tmp', 'pdf')
+      @hostname = (URI(Setting.host_name).host or Setting.host_name)
       FileUtils.mkdir_p(@tmpdir) unless File.directory?(@tmpdir)
       raise 'No wiki page found' unless @wiki
     end
@@ -24,14 +25,16 @@ module Wikitopdf
     def url_by_page page
       '"' + @controller.url_for(:controller => 'wiki', :action => 'show',
         :project_id => page.project, :id => page.title,
-        :host => Setting.host_name) + '"'
+        :host => @hostname) + '"'
     end
 
     def pdf_page_hierarchy(node)
       pages = @wiki.pages.joins(:content).order(:title).select('wiki_pages.*, wiki_contents.updated_on')
       Rails.logger.debug("pages #{pages.size}")
       pages_by_parent_id = pages.group_by(&:parent_id)
-      pdf_page_hierarchy_impl(pages_by_parent_id, node)
+      pages = pdf_page_hierarchy_impl(pages_by_parent_id, node)
+      Rails.logger.debug("pages list: #{pages.join(', ')}")
+      pages
     end
 
     def pdf_page_hierarchy_impl(pages, node)
