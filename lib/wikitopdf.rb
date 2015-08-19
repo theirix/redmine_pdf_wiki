@@ -11,7 +11,7 @@ module Wikitopdf
       @controller = controller
       @wiki = @project.wiki
       @tmpdir = Rails.root.join('tmp', 'pdf')
-      @hostname = (URI(Setting.host_name).host or Setting.host_name)
+      @hostname = (URI.parse(PdfExport.prepend_with('http://', Setting.host_name)).host or Setting.host_name)
       FileUtils.mkdir_p(@tmpdir) unless File.directory?(@tmpdir)
       raise 'No wiki page found' unless @wiki
     end
@@ -21,6 +21,10 @@ module Wikitopdf
     end
 
   private
+
+    def self.prepend_with prefix, s
+      s.starts_with?(prefix) ? s : (prefix + s)
+    end
 
     def url_by_page page
       '"' + @controller.url_for(:controller => 'wiki', :action => 'show',
