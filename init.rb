@@ -1,6 +1,5 @@
 #PDF plugin for REDMINE
 require 'redmine'
-require 'wiki_page'
 
 Redmine::Plugin.register :redmine_pdf_wiki do
   name 'WikiToPdf plugin'
@@ -19,6 +18,8 @@ require 'wiki_page_patch'
 
 ActionDispatch::Callbacks.to_prepare do
   require_dependency 'redmine/export/pdf'
+  require_dependency 'wiki_helper'
+  require_dependency 'wiki_page'
 
   if Redmine::VERSION::MAJOR >= 3
     # redmine 3
@@ -31,7 +32,7 @@ ActionDispatch::Callbacks.to_prepare do
       WikiController.send(:include, Wikitopdf::PDFPatch)
     end
   end
-  unless WikiController.included_modules.include? Wikitopdf::WikiPagePatch
+  unless WikiPage.included_modules.include? Wikitopdf::WikiPagePatch
     WikiPage.send(:include, Wikitopdf::WikiPagePatch)
   end
 end
