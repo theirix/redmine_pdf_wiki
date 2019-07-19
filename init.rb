@@ -16,7 +16,13 @@ end
 require 'wikitopdf'
 require 'wiki_page_patch'
 
-ActionDispatch::Callbacks.to_prepare do
+
+if Rails::VERSION::MAJOR >= 5 and Rails::VERSION::MINOR >= 1
+    reloader = ActiveSupport::Reloader
+else
+    reloader = ActionDispatch::Callbacks
+end
+reloader.to_prepare do
   require_dependency 'redmine/export/pdf'
   require_dependency 'wiki_helper'
   require_dependency 'wiki_page'
