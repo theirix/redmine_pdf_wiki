@@ -39,10 +39,12 @@ module Wikitopdf
 
     def controller_wiki_edit_after_save context
       attrs = context[:params][:wikitopdf_toc_page]
-      if context[:page].wikitopdf_toc_page
-        context[:page].wikitopdf_toc_page.update_attributes attrs
-      else
-        context[:page].wikitopdf_toc_page = WikitopdfTocPage.create(attrs)
+      if attrs
+        if context[:page].wikitopdf_toc_page
+          context[:page].wikitopdf_toc_page.update_attributes attrs
+        else
+          context[:page].wikitopdf_toc_page = WikitopdfTocPage.create(attrs)
+        end
       end
     end
   end
