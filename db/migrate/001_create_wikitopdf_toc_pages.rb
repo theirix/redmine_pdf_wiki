@@ -1,4 +1,4 @@
-class CreateWikitopdfTocPages < ActiveRecord::Migration
+class CreateWikitopdfTocPages < (Rails.version < '5.1') ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
   def change
     create_table :wikitopdf_toc_pages do |t|
       t.boolean :istoc
