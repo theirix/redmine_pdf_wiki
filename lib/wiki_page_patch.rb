@@ -3,9 +3,12 @@ module Wikitopdf
   class ViewHook < Redmine::Hook::ViewListener
 
     def view_layouts_base_body_bottom(context= { })
+      # Redmine 4 is not supported because it is hard
+      # to inject partial inside a wiki editor form
+      return '' if Redmine::VERSION::MAJOR >= 4
+
       controller = context[:controller]
       action = controller.action_name
-      request = context[:request]
 
       hook_res = ''
       if controller.is_a?(WikiController)
